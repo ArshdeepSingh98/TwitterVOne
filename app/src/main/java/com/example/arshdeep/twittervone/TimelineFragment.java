@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.AbsListView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -150,7 +151,7 @@ public class TimelineFragment extends Fragment {
                 .client(client)
                 .build();
         ApiInterface apiInterface =  retrofit.create(ApiInterface.class);
-        Call<ArrayList<HomeTweetResponse>> call  =  apiInterface.getHomeTimeline(mUserName,20);
+        Call<ArrayList<HomeTweetResponse>> call  =  apiInterface.getHomeTimeline(mUserName,50);
         call.enqueue(new Callback<ArrayList<HomeTweetResponse>>() {
             @Override
             public void onResponse(Call<ArrayList<HomeTweetResponse>> call, Response<ArrayList<HomeTweetResponse>> response) {
@@ -163,8 +164,8 @@ public class TimelineFragment extends Fragment {
             }
 
             private void onDownloadComplete(ArrayList<Long> ids) {
-                for(final long id : ids){
-                    TweetUtils.loadTweet(id, new com.twitter.sdk.android.core.Callback<com.twitter.sdk.android.core.models.Tweet>() {
+                for(final long idq : ids){
+                    TweetUtils.loadTweet(idq, new com.twitter.sdk.android.core.Callback<com.twitter.sdk.android.core.models.Tweet>() {
                         @Override
                         public void success(Result<Tweet> result) {
                             Tweet tweet = result.data;
@@ -174,7 +175,7 @@ public class TimelineFragment extends Fragment {
                             tweetView.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
-                                    String url = "https://twitter.com/" + mUserName + "/status/" + id;
+                                    String url = "https://twitter.com/" + mUserName + "/status/" + idq;
                                     AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
                                     alert.setTitle(mUserName);
 
@@ -198,14 +199,16 @@ public class TimelineFragment extends Fragment {
                                     alert.show();
                                 }
                             });
-
                             linearLayoutTweetHolder.addView(tweetView);
+
                         }
                         @Override
                         public void failure(TwitterException exception) {
 
                         }
                     });
+
+
                 }
             }
 
