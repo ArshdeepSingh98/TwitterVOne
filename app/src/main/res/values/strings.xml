@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">TwitterVOne</string>
+    <string name="com.twitter.sdk.android.CONSUMER_KEY">LT7Au2eT2X9Fhn7gSXy72Rg69</string>
+    <string name="com.twitter.sdk.android.CONSUMER_SECRET">GwTjcWvNAnTgX9lYw8SsWqCi4GkqPfuvYWe8akDgW5LEae6K8m</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+</resources>
