@@ -2,11 +2,18 @@ package com.example.arshdeep.twittervone;
 
 import android.content.DialogInterface;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -67,33 +74,43 @@ public class TweetsFragment extends Fragment{
     ListAdapter timelineAdapter;
     ArrayList< String > tweet_text;
 
-    @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-        if(isVisibleToUser){
-            if(firstTime){
-                Log.i("Visible","first");
-            }else {
-                linearLayoutTweetHolder.removeAllViews();
-                updateProfilePicture();
-                fetchTweet();
-            }
-        }
-    }
+//    @Override
+//    public void setUserVisibleHint(boolean isVisibleToUser) {
+//        super.setUserVisibleHint(isVisibleToUser);
+//        if(isVisibleToUser){
+//            if(firstTime){
+//                Log.i("Visible","first");
+//            }else {
+//                linearLayoutTweetHolder.removeAllViews();
+//                updateProfilePicture();
+//                fetchTweet();
+////                ((ProfileActivity)getActivity()).toolbar.setTitle("User");
+//
+//            }
+//        }
+//    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_tweets , container , false);
+        linearLayoutTweetHolder = v.findViewById(R.id.linearLayoutUserTweetHolder);
+        swipeRefreshLayout = v.findViewById(R.id.userRefresh);
+        profile_picture = v.findViewById(R.id.profile_picture);
+        user_tweets = v.findViewById(R.id.user_tweets);
+        user_follwing = v.findViewById(R.id.user_following);
+        user_likes =  v.findViewById(R.id.user_likes);
+        bgprofile =  v.findViewById(R.id.bgprofile);
 
+//        ((ProfileActivity)getActivity()).toolbar.setTitle("User");
 
-        linearLayoutTweetHolder = (LinearLayout) v.findViewById(R.id.linearLayoutUserTweetHolder);
-        swipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.userRefresh);
-        profile_picture = (CircleImageView) v.findViewById(R.id.profile_picture);
-        user_tweets = (TextView) v.findViewById(R.id.user_tweets);
-        user_follwing = (TextView) v.findViewById(R.id.user_following);
-        user_likes = (TextView) v.findViewById(R.id.user_likes);
-        bgprofile = (ImageView) v.findViewById(R.id.bgprofile);
+        Toolbar tweet_toolbar = (Toolbar) v.findViewById(R.id.tweet_toolbar);
+        ((AppCompatActivity)getActivity()).setSupportActionBar(tweet_toolbar);
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        CollapsingToolbarLayout collapsingToolbarLayout = v.findViewById(R.id.tweet_collapse);
+        collapsingToolbarLayout.setTitle(" ");
+        collapsingToolbarLayout.setContentScrimColor(ContextCompat.getColor(getContext() , R.color.colorPrimary));
+
 
         firstTime = false;
         setHasOptionsMenu(true);
@@ -113,6 +130,7 @@ public class TweetsFragment extends Fragment{
             @Override
             public void onRefresh() {
                 swipeRefreshLayout.setRefreshing(true);
+                //todo : implement async task
                 linearLayoutTweetHolder.removeAllViews();
                 fetchTweet();
                 updateProfilePicture();
@@ -163,13 +181,13 @@ public class TweetsFragment extends Fragment{
             public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
                 UserResponse userData = response.body();
                 String profileUrl = userData.getProfile_image_url();
-                String profileBg = userData.getBgImage();
+                String profileBg = userData.getBannerImage();
                 String profileBgColor = userData.getBgColor();
                 if(profileBg == null){
                     profileBgColor = "#" + profileBgColor;
                     bgprofile.setBackgroundColor(Color.parseColor(profileBgColor));
                 }else{
-                    Picasso.with(getContext()).load(profileBgColor).error(R.drawable.fail).into(bgprofile);
+                    Picasso.with(getContext()).load(profileBg).error(R.drawable.fail).into(bgprofile);
                 }
                 Picasso.with(getContext()).load(profileUrl).placeholder(R.color.cardview_dark_background).error(R.drawable.fail).into(profile_picture);
                 user_tweets.setText(String.valueOf(userData.getTweetsCount()));
@@ -222,7 +240,7 @@ public class TweetsFragment extends Fragment{
                         @Override
                         public void success(Result<Tweet> result) {
                             Tweet tweet = result.data;
-                            final TweetView tweetView = new TweetView(getContext() , tweet , R.style.tw__TweetDarkWithActionsStyle);
+                            final TweetView tweetView = new TweetView(getContext() , tweet , R.style.tw__TweetLightWithActionsStyle);
                             //tweetView.setOnActionCallback(actionCallback);
 
                             tweetView.setOnClickListener(new View.OnClickListener() {
@@ -253,7 +271,14 @@ public class TweetsFragment extends Fragment{
                                 }
                             });
 
-                            linearLayoutTweetHolder.addView(tweetView);
+                            CardView card = new CardView(getContext());
+                            ViewGroup.LayoutParams params = new DrawerLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                            card.setContentPadding(0,0,0,2);
+                            card.setBackgroundColor(Color.parseColor("#E0E0E0"));
+                            card.setMaxCardElevation(2);
+
+                            card.addView(tweetView);
+                            linearLayoutTweetHolder.addView(card);
                         }
                         @Override
                         public void failure(TwitterException exception) {

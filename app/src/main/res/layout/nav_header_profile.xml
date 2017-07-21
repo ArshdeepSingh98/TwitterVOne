@@ -6,6 +6,8 @@
     android:layout_height="160dp"
     android:background="@drawable/nav_bar_background"
     android:gravity="bottom"
+    android:theme="@style/AppTheme"
+    android:fitsSystemWindows="true"
     android:padding="16dp">
 
     <ImageView

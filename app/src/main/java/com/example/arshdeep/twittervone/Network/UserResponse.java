@@ -25,6 +25,17 @@ public class UserResponse {
     @SerializedName("profile_background_image_url")
     private String bgImage;
 
+    @SerializedName("profile_banner_url")
+    private String bannerImage;
+
+    public String getBannerImage() {
+        return bannerImage;
+    }
+
+    public void setBannerImage(String bannerImage) {
+        this.bannerImage = bannerImage;
+    }
+
     public String getBgColor() {
         return bgColor;
     }

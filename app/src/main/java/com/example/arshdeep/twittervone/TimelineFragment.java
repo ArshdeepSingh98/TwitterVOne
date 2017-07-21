@@ -2,12 +2,15 @@ package com.example.arshdeep.twittervone;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatSpinner;
+import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -20,6 +23,7 @@ import android.widget.AbsListView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.arshdeep.twittervone.Network.ApiInterface;
@@ -69,18 +73,20 @@ public class TimelineFragment extends Fragment {
     ListAdapter timelineAdapter;
     ArrayList < String > tweet_text;
 
-    @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-        if(isVisibleToUser){
-            if(firstTime){
-                Log.i("Visible","first");
-            }else {
-                linearLayoutTweetHolder.removeAllViews();
-                fetchTimeline();
-            }
-        }
-    }
+//    @Override
+//    public void setUserVisibleHint(boolean isVisibleToUser) {
+//        super.setUserVisibleHint(isVisibleToUser);
+//        if(isVisibleToUser){
+//            if(firstTime){
+//                Log.i("Visible","first");
+//            }else {
+//                linearLayoutTweetHolder.removeAllViews();
+//                fetchTimeline();
+////                ((ProfileActivity)getActivity()).toolbar.setTitle("Home");
+//
+//            }
+//        }
+//    }
 
 
     @Nullable
@@ -90,6 +96,9 @@ public class TimelineFragment extends Fragment {
 
         linearLayoutTweetHolder = (LinearLayout) v.findViewById(R.id.linearLayoutTweetHolder);
         swipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipeRefresh);
+
+//        ((ProfileActivity)getActivity()).toolbar.setTitle("Home");
+
 
         firstTime = false;
 
@@ -169,7 +178,7 @@ public class TimelineFragment extends Fragment {
                         @Override
                         public void success(Result<Tweet> result) {
                             Tweet tweet = result.data;
-                            final TweetView tweetView = new TweetView(getContext() , tweet , R.style.tw__TweetDarkWithActionsStyle);
+                            final TweetView tweetView = new TweetView(getContext() , tweet , R.style.tw__TweetLightWithActionsStyle);
                             //tweetView.setOnActionCallback(actionCallback);
 
                             tweetView.setOnClickListener(new View.OnClickListener() {
@@ -199,7 +208,15 @@ public class TimelineFragment extends Fragment {
                                     alert.show();
                                 }
                             });
-                            linearLayoutTweetHolder.addView(tweetView);
+
+                            CardView card = new CardView(getContext());
+                            ViewGroup.LayoutParams params = new DrawerLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                            card.setContentPadding(0,0,0,2);
+                            card.setBackgroundColor(Color.parseColor("#E0E0E0"));
+                            card.setMaxCardElevation(2);
+
+                            card.addView(tweetView);
+                            linearLayoutTweetHolder.addView(card);
 
                         }
                         @Override
@@ -248,6 +265,7 @@ public class TimelineFragment extends Fragment {
 //
 //            }
 //        });
+
     }
 
 //    final com.twitter.sdk.android.core.Callback<com.example.arshdeep.twittervone.Tweet> actionCallback = new com.twitter.sdk.android.core.Callback<com.example.arshdeep.twittervone.Tweet>() {

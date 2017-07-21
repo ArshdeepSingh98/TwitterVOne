@@ -1,10 +1,13 @@
 package com.example.arshdeep.twittervone;
 
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -54,9 +57,11 @@ public class SearchFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_search , container , false);
 
-        linearLayoutSearchHolder = (LinearLayout) v.findViewById(R.id.linearLayoutSearchHolder);
-        searchView = (MaterialSearchView) v.findViewById(R.id.search_view);
+        linearLayoutSearchHolder = v.findViewById(R.id.linearLayoutSearchHolder);
+        searchView = v.findViewById(R.id.search_view);
         setHasOptionsMenu(true);
+
+//        ((ProfileActivity)getActivity()).toolbar.setTitle("Search");
 
         Bundle b = getArguments();
         if(b != null){
@@ -121,7 +126,7 @@ public class SearchFragment extends Fragment {
                                     @Override
                                     public void success(Result<com.twitter.sdk.android.core.models.Tweet> result) {
                                         com.twitter.sdk.android.core.models.Tweet tweet = result.data;
-                                        final TweetView tweetView = new TweetView(getContext() , tweet , R.style.tw__TweetDarkWithActionsStyle);
+                                        final TweetView tweetView = new TweetView(getContext() , tweet , R.style.tw__TweetLightWithActionsStyle);
                                         //tweetView.setOnActionCallback(actionCallback);
 
                                         tweetView.setOnClickListener(new View.OnClickListener() {
@@ -152,7 +157,14 @@ public class SearchFragment extends Fragment {
                                             }
                                         });
 
-                                        linearLayoutSearchHolder.addView(tweetView);
+                                        CardView card = new CardView(getContext());
+                                        ViewGroup.LayoutParams params = new DrawerLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                                        card.setContentPadding(0,0,0,2);
+                                        card.setBackgroundColor(Color.parseColor("#E0E0E0"));
+                                        card.setMaxCardElevation(2);
+
+                                        card.addView(tweetView);
+                                        linearLayoutSearchHolder.addView(card);
                                     }
                                     @Override
                                     public void failure(TwitterException exception) {

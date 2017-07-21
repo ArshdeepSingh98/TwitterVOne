@@ -3,6 +3,7 @@ package com.example.arshdeep.twittervone;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.icu.text.UnicodeSetSpanner;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -31,6 +32,7 @@ import android.widget.Toast;
 
 import com.example.arshdeep.twittervone.Network.ApiInterface;
 import com.example.arshdeep.twittervone.Network.HomeTweetResponse;
+import com.ms_square.etsyblur.BlurSupport;
 import com.twitter.sdk.android.core.OAuthSigning;
 import com.twitter.sdk.android.core.Twitter;
 import com.twitter.sdk.android.core.TwitterApiClient;
@@ -52,12 +54,10 @@ public class ProfileActivity extends AppCompatActivity implements NavigationView
 
     String token,secret,userName;
     long id,userId;
-    private SectionsPagerAdapter mSectionsPAgerAdapter;
     private static final String ARG_SECTION_NUMBER = "section_number";
-    private ViewPager mViewPager;
-    private TabLayout tabLayout;
-    final private int tabCount = 4;
     private static final int PICK_IMAGE = 100;
+    TabLayout tabLayout;
+    Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,16 +65,16 @@ public class ProfileActivity extends AppCompatActivity implements NavigationView
         setContentView(R.layout.activity_profile);
 
         //toolbar
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        toolbar.setTitleTextColor(Color.BLACK);
 
         //fab
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //selecting image
+                //selecting image from gallary
                 Toast.makeText(ProfileActivity.this, "Select Image", Toast.LENGTH_SHORT).show();
                 Intent intent1 = new Intent();
                 intent1.setType("image/*");
@@ -90,17 +90,54 @@ public class ProfileActivity extends AppCompatActivity implements NavigationView
         toggle.syncState();
         NavigationView navigstionView = (NavigationView) findViewById(R.id.nav_view);
         navigstionView.setNavigationItemSelectedListener(this);
+        BlurSupport.addTo(drawer);
 
         //viewPagerAdapter
-        mSectionsPAgerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        SectionsPagerAdapter mSectionsPAgerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         //viewPager with sectionsAdapter
-        mViewPager = (ViewPager) findViewById(R.id.container2);
+        ViewPager mViewPager = (ViewPager) findViewById(R.id.container2);
         mViewPager.setAdapter(mSectionsPAgerAdapter);
 
         //tablayout
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
+        setTabIcons();
+        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                int pos = tab.getPosition();
+                if(pos == 0){
+                    tab.setIcon(R.drawable.ic_action_user_blue);
+                }else if(pos == 1){
+                    tab.setIcon(R.drawable.ic_action_home_blue);
+                }else if(pos == 2){
+                    tab.setIcon(R.drawable.ic_action_star_10_blue);
+                }else if(pos == 3){
+                    tab.setIcon(R.drawable.ic_action_search_blue);
+                }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+                int pos = tab.getPosition();
+                if(pos == 0){
+                    tab.setIcon(R.drawable.ic_action_user);
+                }else if(pos == 1){
+                    tab.setIcon(R.drawable.ic_action_home);
+                }else if(pos == 2){
+                    tab.setIcon(R.drawable.ic_action_star_10);
+                }else if(pos == 3){
+                    tab.setIcon(R.drawable.ic_action_search);
+                }
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
+
 
         //getting token and secret from login activity
         token = getIntent().getStringExtra("token");
@@ -108,8 +145,6 @@ public class ProfileActivity extends AppCompatActivity implements NavigationView
         userName = getIntent().getStringExtra("userName");
         id = getIntent().getLongExtra("id",0);
         userId = getIntent().getLongExtra("userId",0);
-
-
 
         //tweet fragment
 //        TweetsFragment tweetsFragment = new TweetsFragment();
@@ -131,6 +166,26 @@ public class ProfileActivity extends AppCompatActivity implements NavigationView
 //        getSupportFragmentManager().beginTransaction().replace(R.id.container , timelineFragment).commit();
 
     }
+
+    private void setTabIcons() {
+        tabLayout.getTabAt(0).setIcon(R.drawable.ic_action_user_blue);
+        tabLayout.getTabAt(1).setIcon(R.drawable.ic_action_home);
+        tabLayout.getTabAt(2).setIcon(R.drawable.ic_action_star_10);
+        tabLayout.getTabAt(3).setIcon(R.drawable.ic_action_search);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        android.os.Process.killProcess(android.os.Process.myPid());
+//        System.exit(0);
+        finish();
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_HOME);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -157,7 +212,6 @@ public class ProfileActivity extends AppCompatActivity implements NavigationView
             startActivity(intent);
         }
     }
-
 
     public class MyResultReceiver extends BroadcastReceiver {
         @Override
@@ -282,22 +336,24 @@ public class ProfileActivity extends AppCompatActivity implements NavigationView
 
         @Override
         public int getCount() {
-            return tabCount;
+            return 4;
         }
 
-        @Override
-        public CharSequence getPageTitle(int position) {
-            switch (position){
-                case 0:
-                    return "User";
-                case 1:
-                    return "Home";
-                case 2:
-                    return "Favorites";
-                case 3:
-                    return "Search";
-            }
-            return null;
-        }
+//        @Override
+//        public CharSequence getPageTitle(int position) {
+//            switch (position){
+//                case 0:
+//                    return "User";
+//                case 1:
+//                    return "Home";
+//                case 2:
+//                    return "Favorites";
+//                case 3:
+//                    return "Search";
+//            }
+//            return null;
+//        }
+
+
     }
 }
