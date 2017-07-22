@@ -1,4 +1,4 @@
-package com.example.arshdeep.twittervone;
+package com.example.arshdeep.twittervone.UI;
 
 import android.content.DialogInterface;
 import android.graphics.Color;
@@ -23,7 +23,9 @@ import android.widget.Toast;
 import com.example.arshdeep.twittervone.Network.ApiInterface;
 import com.example.arshdeep.twittervone.Network.HomeTweetResponse;
 import com.example.arshdeep.twittervone.Network.OAuthInterceptor;
+import com.example.arshdeep.twittervone.Network.RetrofitClient;
 import com.example.arshdeep.twittervone.Network.SearchTweetResponse;
+import com.example.arshdeep.twittervone.R;
 import com.miguelcatalan.materialsearchview.MaterialSearchView;
 import com.twitter.sdk.android.core.Result;
 import com.twitter.sdk.android.core.TwitterException;
@@ -79,25 +81,7 @@ public class SearchFragment extends Fragment {
 
     private void searchTweets() {
 
-        OAuthInterceptor oauth1Woocommerce = new OAuthInterceptor.Builder()
-                .consumerKey(Config.CONSUMER_KEY)
-                .consumerSecret(Config.CONSUMER_SECRET)
-                .tokenFunction(Config.TOKEN_KEY)
-                .secretFunction(Config.TOKEN_SECRET)
-                .build();
-        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-        OkHttpClient client = new OkHttpClient.Builder()
-                .addInterceptor(oauth1Woocommerce)// Interceptor oauth1Woocommerce added
-                .build();
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://api.twitter.com/1.1/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(client)
-                .build();
-        final ApiInterface apiInterface =  retrofit.create(ApiInterface.class);
-
+        final RetrofitClient retroClient = RetrofitClient.getInstance();
         searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -107,7 +91,7 @@ public class SearchFragment extends Fragment {
             @Override
             public boolean onQueryTextChange(String newText) {
                 if(newText != null && !newText.isEmpty()){
-                    Call<SearchTweetResponse> call  =  apiInterface.getSearchTweets(newText);
+                    Call<SearchTweetResponse> call  =  retroClient.getApiInterface().getSearchTweets(newText);
                     call.enqueue(new Callback<SearchTweetResponse>() {
                         @Override
                         public void onResponse(Call<SearchTweetResponse> call, Response<SearchTweetResponse> response) {
@@ -128,6 +112,15 @@ public class SearchFragment extends Fragment {
                                         com.twitter.sdk.android.core.models.Tweet tweet = result.data;
                                         final TweetView tweetView = new TweetView(getContext() , tweet , R.style.tw__TweetLightWithActionsStyle);
                                         //tweetView.setOnActionCallback(actionCallback);
+
+                                        CardView card = new CardView(getContext());
+                                        ViewGroup.LayoutParams params = new DrawerLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                                        card.setContentPadding(0,0,0,2);
+                                        card.setBackgroundColor(Color.parseColor("#E0E0E0"));
+                                        card.setMaxCardElevation(2);
+
+                                        card.addView(tweetView);
+                                        linearLayoutSearchHolder.addView(card);
 
                                         tweetView.setOnClickListener(new View.OnClickListener() {
                                             @Override
@@ -156,15 +149,6 @@ public class SearchFragment extends Fragment {
                                                 alert.show();
                                             }
                                         });
-
-                                        CardView card = new CardView(getContext());
-                                        ViewGroup.LayoutParams params = new DrawerLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                                        card.setContentPadding(0,0,0,2);
-                                        card.setBackgroundColor(Color.parseColor("#E0E0E0"));
-                                        card.setMaxCardElevation(2);
-
-                                        card.addView(tweetView);
-                                        linearLayoutSearchHolder.addView(card);
                                     }
                                     @Override
                                     public void failure(TwitterException exception) {

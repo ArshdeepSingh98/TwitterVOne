@@ -1,5 +1,6 @@
-package com.example.arshdeep.twittervone;
+package com.example.arshdeep.twittervone.UI;
 
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -27,8 +28,11 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.arshdeep.twittervone.Network.ApiInterface;
+import com.example.arshdeep.twittervone.Network.FollowResponse;
 import com.example.arshdeep.twittervone.Network.HomeTweetResponse;
 import com.example.arshdeep.twittervone.Network.OAuthInterceptor;
+import com.example.arshdeep.twittervone.Network.RetrofitClient;
+import com.example.arshdeep.twittervone.R;
 import com.twitter.sdk.android.core.OAuthSigning;
 import com.twitter.sdk.android.core.Result;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
@@ -141,26 +145,8 @@ public class TimelineFragment extends Fragment {
     }
 
     private void fetchTimeline() {
-        //todo : make singleton class of this
-        OAuthInterceptor oauth1Woocommerce = new OAuthInterceptor.Builder()
-                .consumerKey(Config.CONSUMER_KEY)
-                .consumerSecret(Config.CONSUMER_SECRET)
-                .tokenFunction(Config.TOKEN_KEY)
-                .secretFunction(Config.TOKEN_SECRET)
-                .build();
-        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-        OkHttpClient client = new OkHttpClient.Builder()
-                .addInterceptor(oauth1Woocommerce)// Interceptor oauth1Woocommerce added
-                .build();
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://api.twitter.com/1.1/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(client)
-                .build();
-        ApiInterface apiInterface =  retrofit.create(ApiInterface.class);
-        Call<ArrayList<HomeTweetResponse>> call  =  apiInterface.getHomeTimeline(mUserName,50);
+        final RetrofitClient retroClient = RetrofitClient.getInstance();
+        Call<ArrayList<HomeTweetResponse>> call  =  retroClient.getApiInterface().getHomeTimeline(mUserName,50);
         call.enqueue(new Callback<ArrayList<HomeTweetResponse>>() {
             @Override
             public void onResponse(Call<ArrayList<HomeTweetResponse>> call, Response<ArrayList<HomeTweetResponse>> response) {
@@ -180,6 +166,16 @@ public class TimelineFragment extends Fragment {
                             Tweet tweet = result.data;
                             final TweetView tweetView = new TweetView(getContext() , tweet , R.style.tw__TweetLightWithActionsStyle);
                             //tweetView.setOnActionCallback(actionCallback);
+
+                            //card view for tweets
+                            CardView card = new CardView(getContext());
+                            ViewGroup.LayoutParams params = new DrawerLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                            card.setContentPadding(0,0,0,2);
+                            card.setBackgroundColor(Color.parseColor("#E0E0E0"));
+                            card.setMaxCardElevation(2);
+
+                            card.addView(tweetView);
+                            linearLayoutTweetHolder.addView(card);
 
                             tweetView.setOnClickListener(new View.OnClickListener() {
                                 @Override
@@ -209,15 +205,49 @@ public class TimelineFragment extends Fragment {
                                 }
                             });
 
-                            CardView card = new CardView(getContext());
-                            ViewGroup.LayoutParams params = new DrawerLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                            card.setContentPadding(0,0,0,2);
-                            card.setBackgroundColor(Color.parseColor("#E0E0E0"));
-                            card.setMaxCardElevation(2);
+                            tweetView.setOnLongClickListener(new View.OnLongClickListener() {
+                                @Override
+                                public boolean onLongClick(View view) {
+                                    AlertDialog.Builder follow_alert = new AlertDialog.Builder(getContext());
+                                    follow_alert.setTitle("Confirm to follow ?");
 
-                            card.addView(tweetView);
-                            linearLayoutTweetHolder.addView(card);
+//                                    AlertDialog follow_alert = new AlertDialog.Builder(getContext()).setTitle("").create();
+//                                    BlurAlertDialog blurAlertDialog = new BlurAlertDialog();
+//                                    follow_alert = (AlertDialog)blurAlertDialog.onCreateDialog(null);
 
+
+                                    follow_alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            Call <FollowResponse> call = retroClient.getApiInterface().postFollowTweet(idq,true);
+                                            call.enqueue(new Callback<FollowResponse>() {
+                                                @Override
+                                                public void onResponse(Call<FollowResponse> call, Response<FollowResponse> response) {
+                                                    if(response.isSuccessful()){
+                                                        Toast.makeText(getContext(), "Success!", Toast.LENGTH_SHORT).show();
+                                                    }else{
+                                                        Toast.makeText(getContext(), "Failed to follow", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                }
+
+                                                @Override
+                                                public void onFailure(Call<FollowResponse> call, Throwable t) {
+
+                                                }
+                                            });
+                                        }
+                                    });
+
+                                    follow_alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            dialogInterface.dismiss();
+                                        }
+                                    });
+                                    follow_alert.show();
+                                    return true;
+                                }
+                            });
                         }
                         @Override
                         public void failure(TwitterException exception) {

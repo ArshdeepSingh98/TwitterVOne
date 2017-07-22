@@ -1,4 +1,4 @@
-package com.example.arshdeep.twittervone;
+package com.example.arshdeep.twittervone.Data;
 
 /**
  * Created by Arshdeep on 7/18/2017.

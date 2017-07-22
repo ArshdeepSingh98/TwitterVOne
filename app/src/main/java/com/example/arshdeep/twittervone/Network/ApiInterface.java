@@ -10,6 +10,7 @@ import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Headers;
+import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
@@ -36,6 +37,12 @@ public interface ApiInterface {
 
     @GET("search/tweets.json")
     Call <SearchTweetResponse> getSearchTweets(@Query("q")String qry);
+
+    @POST("friendships/create.json")
+    Call <FollowResponse> postFollowTweet(@Query("user_id")long id , @Query("follow")boolean follow);
+
+    @GET("friends/list.json")
+    Call <FollowResponse> getFollowTweets();
 
     //@Header("Authorization")String auth
 //    @FormUrlEncoded

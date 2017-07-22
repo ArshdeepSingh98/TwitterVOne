@@ -1,10 +1,9 @@
-package com.example.arshdeep.twittervone;
+package com.example.arshdeep.twittervone.UI;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.icu.text.UnicodeSetSpanner;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -16,13 +15,10 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,25 +26,12 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.arshdeep.twittervone.Network.ApiInterface;
-import com.example.arshdeep.twittervone.Network.HomeTweetResponse;
+import com.example.arshdeep.twittervone.R;
 import com.ms_square.etsyblur.BlurSupport;
-import com.twitter.sdk.android.core.OAuthSigning;
-import com.twitter.sdk.android.core.Twitter;
-import com.twitter.sdk.android.core.TwitterApiClient;
-import com.twitter.sdk.android.core.TwitterAuthConfig;
-import com.twitter.sdk.android.core.TwitterAuthToken;
 import com.twitter.sdk.android.core.TwitterCore;
 import com.twitter.sdk.android.core.TwitterSession;
 import com.twitter.sdk.android.tweetcomposer.ComposerActivity;
 import com.twitter.sdk.android.tweetcomposer.TweetUploadService;
-
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Map;
-
-import retrofit2.Call;
-import retrofit2.http.Header;
 
 public class ProfileActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -82,6 +65,7 @@ public class ProfileActivity extends AppCompatActivity implements NavigationView
                 startActivityForResult(Intent.createChooser(intent1 , "Select Picture") , PICK_IMAGE);
             }
         });
+        fab.setImageResource(R.drawable.ic_action_twitter_white);
 
         //navigation drawer layout
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -172,42 +156,41 @@ public class ProfileActivity extends AppCompatActivity implements NavigationView
         tabLayout.getTabAt(1).setIcon(R.drawable.ic_action_home);
         tabLayout.getTabAt(2).setIcon(R.drawable.ic_action_star_10);
         tabLayout.getTabAt(3).setIcon(R.drawable.ic_action_search);
+        tabLayout.getTabAt(4).setIcon(R.drawable.fail);
     }
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        android.os.Process.killProcess(android.os.Process.myPid());
+//    @Override
+//    public void onBackPressed() {
+//        super.onBackPressed();
+//        android.os.Process.killProcess(android.os.Process.myPid());
 //        System.exit(0);
-        finish();
-        Intent intent = new Intent(Intent.ACTION_MAIN);
-        intent.addCategory(Intent.CATEGORY_HOME);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
-    }
+//        finish();
+//        Intent intent = new Intent(Intent.ACTION_MAIN);
+//        intent.addCategory(Intent.CATEGORY_HOME);
+//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        startActivity(intent);
+//    }
 
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        final TwitterSession session = TwitterCore.getInstance().getSessionManager().getActiveSession();
         if(requestCode == PICK_IMAGE && resultCode == RESULT_OK){
             Uri selectedImage = data.getData();
-            Toast.makeText(ProfileActivity.this, "" + selectedImage, Toast.LENGTH_SHORT).show();
-            final TwitterSession session = TwitterCore.getInstance().getSessionManager().getActiveSession();
             final Intent intent = new ComposerActivity.Builder(ProfileActivity.this)
                     .session(session)
-                    .text("tweet")
+                    .text("Text")
+                    .hashtags("#Tweet")
                     .image(selectedImage)
-                    .hashtags("#twitter")
                     .createIntent();
             startActivity(intent);
         }
         if(requestCode == PICK_IMAGE && resultCode == RESULT_CANCELED){
-            final TwitterSession session = TwitterCore.getInstance().getSessionManager().getActiveSession();
             final Intent intent = new ComposerActivity.Builder(ProfileActivity.this)
                     .session(session)
-                    .text("tweet")
-                    .hashtags("#twitter")
+                    .text("Text")
+                    .hashtags("#Tweet")
                     .createIntent();
             startActivity(intent);
         }
@@ -329,6 +312,16 @@ public class ProfileActivity extends AppCompatActivity implements NavigationView
                 args.putLong("userId", userId);
                 fragment.setArguments(args);
                 return fragment;
+            }else if(position == 4){
+                FollowFragment fragment = new FollowFragment();
+                Bundle args = new Bundle();
+                args.putString("token",token);
+                args.putString("secret",secret);
+                args.putString("userName" ,userName);
+                args.putLong("id" , id);
+                args.putLong("userId", userId);
+                fragment.setArguments(args);
+                return fragment;
             }
 //            return null;
             return PlaceholderFragment.newInstance(position + 1);
@@ -336,7 +329,7 @@ public class ProfileActivity extends AppCompatActivity implements NavigationView
 
         @Override
         public int getCount() {
-            return 4;
+            return 5;
         }
 
 //        @Override

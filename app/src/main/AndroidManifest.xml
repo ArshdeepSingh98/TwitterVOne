@@ -13,7 +13,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".UI.MainActivity">
 
             <!-- <intent-filter> -->
             <!-- <action android:name="android.intent.action.VIEW" /> -->
@@ -28,7 +28,7 @@
             <!-- android:scheme="oauth" /> -->
             <!-- </intent-filter> -->
         </activity>
-        <activity android:name=".ProfileActivity">
+        <activity android:name=".UI.ProfileActivity">
             <receiver
                 android:name=".MyResultReceiver"
                 android:exported="false">
@@ -38,7 +38,7 @@
                 </intent-filter>
             </receiver>
         </activity>
-        <activity android:name=".SplashActivity"
+        <activity android:name=".UI.SplashActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
