@@ -25,7 +25,9 @@ Twitter App made in Android Studio 2.3.3
   * Favorites
   * Search
   * Friends
+ 
 ---
+## Screenshots :
 * ## UI
 |Splash Screen|Navigation Drawer|
 |:------:|:--------:|
