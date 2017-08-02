@@ -2,7 +2,30 @@
 Twitter App made in Android Studio 2.3.3
 ---
 ## Features : 
-
+* #### Create / Login Twitter Account
+* #### Check your full Profile including :
+  * Number of Tweets
+  * Number of Following
+  * Number of Likes
+* #### Post Tweet with / without Image
+* #### Follow, UnFollow People
+* #### Click on Tweet for complete description including :
+  * Like, Share Tweet
+  * Delete your Tweet
+  * **Long Click**
+    * Description
+    * Comments
+* #### Navigate through Navigation Drawer for :
+  * Night Mode
+  * Log Out
+  * Share
+  * Send
+* #### Various Screens including :
+  * Home timeline
+  * Favorites
+  * Search
+  * Friends
+---
 * ## UI
 |Splash Screen|Navigation Drawer|
 |:------:|:--------:|
